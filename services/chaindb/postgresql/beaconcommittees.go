@@ -79,6 +79,7 @@ func (s *Service) BeaconCommitteeBySlotAndIndex(ctx context.Context, slot spec.S
 	return committee, nil
 }
 
+/*
 // AttesterDuties fetches the attester duties at the given slot range for the given validator indices.
 func (s *Service) AttesterDuties(ctx context.Context, startSlot spec.Slot, endSlot spec.Slot, validatorIndices []spec.ValidatorIndex) ([]*chaindb.AttesterDuty, error) {
 	tx := s.tx(ctx)
@@ -94,7 +95,7 @@ func (s *Service) AttesterDuties(ctx context.Context, startSlot spec.Slot, endSl
 	rows, err := tx.Query(ctx, `
       SELECT f_slot
             ,f_index
-            ,f_committee
+            ,f_committee_index
       FROM t_beacon_committees
       WHERE f_slot >= $1
         AND f_slot < $2
@@ -143,3 +144,4 @@ func (s *Service) AttesterDuties(ctx context.Context, startSlot spec.Slot, endSl
 
 	return res, nil
 }
+*/

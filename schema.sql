@@ -54,7 +54,7 @@ CREATE TABLE t_beacon_committees (
 );
 CREATE UNIQUE INDEX i_beacon_committees_1 ON t_beacon_committees(f_slot, f_index);
 
--- t_propser_duties contains all proposer duties.
+-- t_proposer_duties contains all proposer duties.
 -- N.B. in the case of a chain re-org the duties can alter.
 DROP TABLE IF EXISTS t_proposer_duties CASCADE;
 CREATE TABLE t_proposer_duties (
@@ -62,6 +62,19 @@ CREATE TABLE t_proposer_duties (
  ,f_validator_index BIGINT NOT NULL -- REFERENCES t_validators(f_index)
 );
 CREATE UNIQUE INDEX i_proposer_duties_1 ON t_proposer_duties(f_slot);
+
+-- t_attester_duties contains all attester duties.
+-- N.B. in the case of a chain re-org the duties can alter.
+DROP TABLE IF EXISTS t_attester_duties CASCADE;
+CREATE TABLE t_attester_duties (
+  f_slot BIGINT NOT NULL
+ ,f_validator_index BIGINT NOT NULL -- REFERENCES t_validators(f_index)
+ ,f_committee_index BIGINT NOT NULL
+ ,f_validator_committee_index BIGINT NOT NULL
+ ,f_committee_length BIGINT NOT NULL
+);
+CREATE UNIQUE INDEX i_attester_duties_1 ON t_attester_duties(f_slot, f_validator_index);
+CREATE INDEX i_attester_duties_2 ON t_attester_duties(f_validator_index);
 
 -- t_attestations contains all attestations included in blocks.
 DROP TABLE IF EXISTS t_attestations CASCADE;

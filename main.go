@@ -32,6 +32,7 @@ import (
 	zerologger "github.com/rs/zerolog/log"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	standardattesterduties "github.com/wealdtech/chaind/services/attesterduties/standard"
 	standardbeaconcommittees "github.com/wealdtech/chaind/services/beaconcommittees/standard"
 	standardblocks "github.com/wealdtech/chaind/services/blocks/standard"
 	"github.com/wealdtech/chaind/services/chaindb"
@@ -116,6 +117,7 @@ func fetchConfig() error {
 	pflag.Bool("validators.balances.enable", false, "Enable fetching of validator balances")
 	pflag.Bool("beacon-committees.enable", true, "Enable fetching of beacom committee-related information")
 	pflag.Bool("proposer-duties.enable", true, "Enable fetching of proposer duty-related information")
+	pflag.Bool("attester-duties.enable", true, "Enable fetching of attester duty-related information")
 	pflag.String("chaindb.url", "", "URL for database")
 	pflag.Parse()
 	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
@@ -213,6 +215,11 @@ func startServices(ctx context.Context) error {
 	log.Trace().Msg("Starting proposer duties service")
 	if err := startProposerDuties(ctx, eth2Client, chainDB, chainTime); err != nil {
 		return errors.Wrap(err, "failed to start proposer duties service")
+	}
+
+	log.Trace().Msg("Starting attester duties service")
+	if err := startAttesterDuties(ctx, eth2Client, chainDB, chainTime); err != nil {
+		return errors.Wrap(err, "failed to start attester duties service")
 	}
 
 	return nil
@@ -372,6 +379,37 @@ func startProposerDuties(
 	)
 	if err != nil {
 		return errors.Wrap(err, "failed to create proposer duties service")
+	}
+
+	return nil
+}
+
+func startAttesterDuties(
+	ctx context.Context,
+	eth2Client eth2client.Service,
+	chainDB chaindb.Service,
+	chainTime chaintime.Service,
+) error {
+	if !viper.GetBool("attester-duties.enable") {
+		return nil
+	}
+
+	var err error
+	if viper.GetString("attester-duties.address") != "" {
+		eth2Client, err = fetchClient(ctx, viper.GetString("attester-duties.address"))
+		if err != nil {
+			return errors.Wrap(err, fmt.Sprintf("failed to fetch client %q", viper.GetString("attester-duties.address")))
+		}
+	}
+
+	_, err = standardattesterduties.New(ctx,
+		standardattesterduties.WithLogLevel(logLevel(viper.GetString("attester-duties.log-level"))),
+		standardattesterduties.WithETH2Client(eth2Client),
+		standardattesterduties.WithChainTime(chainTime),
+		standardattesterduties.WithChainDB(chainDB),
+	)
+	if err != nil {
+		return errors.Wrap(err, "failed to create attester duties service")
 	}
 
 	return nil

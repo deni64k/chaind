@@ -85,6 +85,12 @@ type ProposerDutiesSetter interface {
 	SetProposerDuty(ctx context.Context, proposerDuty *ProposerDuty) error
 }
 
+// AttesterDutiesSetter defines the functions to create and update attester duties.
+type AttesterDutiesSetter interface {
+	// SetAttesterDuty sets a attester duty.
+	SetAttesterDuty(ctx context.Context, attesterDuty *AttesterDuty) error
+}
+
 // ProposerSlashingsProvider defines functions to access proposer slashings.
 type ProposerSlashingsProvider interface {
 	// ProposerSlashingsForSlotRange fetches all proposer slashings made for the given slot range.

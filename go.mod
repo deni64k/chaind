@@ -2,6 +2,8 @@ module github.com/wealdtech/chaind
 
 go 1.15
 
+replace github.com/wealdtech/chaind => github.com/deni64k/chaind v0.1.5-0.20201211193349-b42e31c792cf
+
 require (
 	github.com/attestantio/go-eth2-client v0.6.10
 	github.com/jackc/pgtype v1.6.1
